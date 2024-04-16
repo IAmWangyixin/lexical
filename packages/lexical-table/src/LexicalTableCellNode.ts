@@ -28,6 +28,7 @@ import {
 } from 'lexical';
 
 import {PIXEL_VALUE_REG_EXP} from './constants';
+import {needWrapperWithParagragh} from './LexicalTableUtils';
 
 export const TableCellHeaderStates = {
   BOTH: 3,
@@ -37,7 +38,7 @@ export const TableCellHeaderStates = {
 };
 
 export type TableCellHeaderState =
-  typeof TableCellHeaderStates[keyof typeof TableCellHeaderStates];
+  (typeof TableCellHeaderStates)[keyof typeof TableCellHeaderStates];
 
 export type SerializedTableCellNode = Spread<
   {
@@ -316,6 +317,22 @@ export function convertTableCellNodeElement(
   }
 
   return {
+    after: (childLexicalNodes) => {
+      if (childLexicalNodes.length === 0) {
+        childLexicalNodes.push($createParagraphNode());
+        return childLexicalNodes;
+      } else {
+        const checkedChildLexicalNodes = childLexicalNodes.map((node) => {
+          if (needWrapperWithParagragh(node)) {
+            const paragraph = $createParagraphNode();
+            paragraph.append(node);
+            return paragraph;
+          }
+          return node;
+        });
+        return checkedChildLexicalNodes;
+      }
+    },
     forChild: (lexicalNode, parentLexicalNode) => {
       if ($isTableCellNode(parentLexicalNode) && !$isElementNode(lexicalNode)) {
         const paragraphNode = $createParagraphNode();

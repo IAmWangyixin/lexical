@@ -7,15 +7,17 @@
  */
 
 import type {TableMapType, TableMapValueType} from './LexicalTableSelection';
-import type {ElementNode, PointType} from 'lexical';
 
+import {$isCodeNode} from '@lexical/code';
+import {$isListNode} from '@lexical/list';
+import {$isQuoteNode} from '@lexical/rich-text';
 import {$findMatchingParent} from '@lexical/utils';
-import {
-  $createParagraphNode,
+import { $createParagraphNode,
   $createTextNode,
   $getSelection,
-  $isRangeSelection,
-  LexicalNode,
+$isParagraphNode, $isRangeSelection,
+ElementNode, LexicalNode,
+PointType,
 } from 'lexical';
 import invariant from 'shared/invariant';
 
@@ -815,3 +817,15 @@ export function $getTableCellNodeRect(tableCellNode: TableCellNode): {
 
   return null;
 }
+
+export const needWrapperWithParagragh = (node: LexicalNode) => {
+  if (
+    $isParagraphNode(node) ||
+    $isListNode(node) ||
+    $isCodeNode(node) ||
+    $isQuoteNode(node)
+  ) {
+    return false;
+  }
+  return true;
+};
